@@ -27,8 +27,33 @@ jobs:
           matrix=$(IFS=,; echo "{\"include\":[${entries[*]}]}")
           echo "$matrix" | jq .
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+  database-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache MySQL image
+        id: mysql-image
+        uses: actions/cache@v6
+        with:
+          path: /tmp/mysql-image.tar
+          key: database-image-mysql-community-server-26.7.1
+      - name: Pull and save MySQL image
+        if: steps.mysql-image.outputs.cache-hit != 'true'
+        run: |
+          docker pull container-registry.oracle.com/mysql/community-server:26.7.1
+          docker save --output /tmp/mysql-image.tar container-registry.oracle.com/mysql/community-server:26.7.1
+      - name: Cache Oracle image
+        id: oracle-image
+        uses: actions/cache@v6
+        with:
+          path: /tmp/oracle-image.tar
+          key: database-image-oracle-free-slim-faststart
+      - name: Pull and save Oracle image
+        if: steps.oracle-image.outputs.cache-hit != 'true'
+        run: |
+          docker pull gvenzl/oracle-free:slim-faststart
+          docker save --output /tmp/oracle-image.tar gvenzl/oracle-free:slim-faststart
   test:
-    needs: discover
+    needs: [discover, database-images]
     name: ${{ matrix.example }} (${{ matrix.language }})
     runs-on: ubuntu-latest
     strategy:
@@ -39,6 +64,24 @@ jobs:
         working-directory: ${{ matrix.example }}/${{ matrix.language }}
     steps:
       - uses: actions/checkout@v7
+      - name: Restore cached MySQL image
+        if: matrix.example == 'data-jdbc-mysql'
+        uses: actions/cache/restore@v6
+        with:
+          path: /tmp/mysql-image.tar
+          key: database-image-mysql-community-server-26.7.1
+      - name: Load MySQL image
+        if: matrix.example == 'data-jdbc-mysql'
+        run: docker load --input /tmp/mysql-image.tar
+      - name: Restore cached Oracle image
+        if: matrix.example == 'data-jdbc-oracle'
+        uses: actions/cache/restore@v6
+        with:
+          path: /tmp/oracle-image.tar
+          key: database-image-oracle-free-slim-faststart
+      - name: Load Oracle image
+        if: matrix.example == 'data-jdbc-oracle'
+        run: docker load --input /tmp/oracle-image.tar
       - name: Read Pyronaut version
         id: pyronaut
         working-directory: .
