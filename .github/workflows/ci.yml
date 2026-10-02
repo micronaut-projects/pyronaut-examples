@@ -39,8 +39,15 @@ jobs:
         working-directory: ${{ matrix.example }}/${{ matrix.language }}
     steps:
       - uses: actions/checkout@v5
+      - name: Read Pyronaut version
+        id: pyronaut
+        working-directory: .
+        # .pyronaut-version pins the release every example runs against; the
+        # update-pyronaut-version workflow bumps it when Pyronaut releases.
+        run: echo "version=$(tr -d '[:space:]' < .pyronaut-version)" >> "$GITHUB_OUTPUT"
       - uses: micronaut-projects/setup-pyronaut@v1
         with:
+          pyronaut-version: ${{ steps.pyronaut.outputs.version }}
           project-dir: ${{ matrix.example }}/${{ matrix.language }}
           cache-key-suffix: ${{ matrix.example }}-${{ matrix.language }}
       - name: Test (Java)
