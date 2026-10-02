@@ -58,7 +58,7 @@ jobs:
         run: pyronaut test main.py -- test_main.py
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-reports-${{ matrix.example }}-${{ matrix.language }}
           path: ${{ matrix.example }}/${{ matrix.language }}/__pyronaut__/reports/tests
