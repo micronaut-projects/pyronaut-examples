@@ -31,7 +31,7 @@ import java.util.Optional;
 @AppConfig(name = "datasources.default.db-type", value = "oracle")
 @AppConfig(name = "datasources.default.dialect", value = "ORACLE")
 @AppConfig(name = "datasources.default.schema-generate", value = "CREATE_DROP")
-public class Config {
+class Config {
 }
 
 @Serdeable
