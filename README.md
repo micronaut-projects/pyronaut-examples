@@ -59,3 +59,9 @@ from the declared driver and starts a database container for `pyronaut dev` and 
 Create a directory with a kebab-case name containing a `README.md`, `java/Main.java` with
 `java/MainTest.java`, and `python/main.py` with `python/test_main.py`. CI discovers new examples
 automatically and tests each one with [setup-pyronaut](https://github.com/micronaut-projects/setup-pyronaut).
+
+## Pyronaut version
+
+CI runs every example against the Pyronaut release pinned in [`.pyronaut-version`](.pyronaut-version).
+When Pyronaut publishes a release, the [Update Pyronaut version](.github/workflows/update-pyronaut-version.yml)
+workflow opens a pull request bumping it, so CI tests the examples against the new release before it is merged.
