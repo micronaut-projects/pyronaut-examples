@@ -1,0 +1,58 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.find.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: find
+        name: Find examples
+        # Every <Example>/java/Main.java and <Example>/python/main.py is a test leg,
+        # so new examples are picked up without editing this workflow.
+        run: |
+          set -euo pipefail
+          entries=()
+          for main in */java/Main.java */python/main.py; do
+            [ -f "$main" ] || continue
+            entries+=("{\"example\":\"${main%%/*}\",\"language\":\"$(basename "$(dirname "$main")")\"}")
+          done
+          matrix=$(IFS=,; echo "{\"include\":[${entries[*]}]}")
+          echo "$matrix" | jq .
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+  test:
+    needs: discover
+    name: ${{ matrix.example }} (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.example }}/${{ matrix.language }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: micronaut-projects/setup-pyronaut@v1
+        with:
+          project-dir: ${{ matrix.example }}/${{ matrix.language }}
+          cache-key-suffix: ${{ matrix.example }}-${{ matrix.language }}
+      - name: Test (Java)
+        if: matrix.language == 'java'
+        run: pyronaut test Main.java -- MainTest.java
+      - name: Test (Python)
+        if: matrix.language == 'python'
+        run: pyronaut test main.py -- test_main.py
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.example }}-${{ matrix.language }}
+          path: ${{ matrix.example }}/${{ matrix.language }}/__pyronaut__/reports/tests
+          if-no-files-found: ignore

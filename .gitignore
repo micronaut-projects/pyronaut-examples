@@ -1,0 +1,8 @@
+__pyronaut__/
+.micronaut/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+.vscode/
