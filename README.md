@@ -24,9 +24,9 @@ them in `__pyronaut__`.
 
 | Example | Description |
 | --- | --- |
-| [HelloWorld](HelloWorld) | A minimal HTTP application |
-| [DataJdbcMySql](DataJdbcMySql) | Micronaut Data JDBC with MySQL |
-| [DataJdbcOracle](DataJdbcOracle) | Micronaut Data JDBC with Oracle Database |
+| [hello-world](hello-world) | A minimal HTTP application |
+| [data-jdbc-mysql](data-jdbc-mysql) | Micronaut Data JDBC with MySQL |
+| [data-jdbc-oracle](data-jdbc-oracle) | Micronaut Data JDBC with Oracle Database |
 
 ## Running an example
 
@@ -56,6 +56,6 @@ from the declared driver and starts a database container for `pyronaut dev` and 
 
 ## Adding an example
 
-Create a directory with a CamelCase name containing a `README.md`, `java/Main.java` with
+Create a directory with a kebab-case name containing a `README.md`, `java/Main.java` with
 `java/MainTest.java`, and `python/main.py` with `python/test_main.py`. CI discovers new examples
 automatically and tests each one with [setup-pyronaut](https://github.com/micronaut-projects/setup-pyronaut).
