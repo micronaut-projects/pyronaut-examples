@@ -31,11 +31,7 @@ import java.util.Optional;
 @AppConfig(name = "datasources.default.db-type", value = "mysql")
 @AppConfig(name = "datasources.default.dialect", value = "MYSQL")
 @AppConfig(name = "datasources.default.schema-generate", value = "CREATE_DROP")
-public class Main {
-    public static void main(String[] args) {
-        Micronaut.run(Main.class, args);
-    }
-}
+class Config { }
 
 @Serdeable
 @MappedEntity
